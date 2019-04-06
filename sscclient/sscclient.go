@@ -52,8 +52,11 @@ func NewSSCClient(url string, keyfile string) (*SSCClient, error) {
 }
 
 //CreateNGO will create an NGO by calling the validator
-func (sscClient *SSCClient) CreateNGO(name string, value string, wait uint) ([]byte, error) {
-	return sscClient.sendTransaction(VerbCreateNGO, name, value, wait)
+func (sscClient *SSCClient) CreateNGO(name string, wait uint) ([]byte, error) {
+	payloadData := map[string]interface{}{}
+	payloadData["Verb"] = VerbCreateNGO
+	payloadData["Name"] = name
+	return sscClient.sendTransaction(payloadData, wait)
 }
 
 func (sscClient *SSCClient) getStatus(batchID string, wait uint) (string, error) {
@@ -83,7 +86,7 @@ func (sscClient *SSCClient) getRequest(path string) ([]byte, error) {
 	return readResponse(response)
 }
 
-func (sscClient *SSCClient) postRequest(path string, data []byte, contentType string, name string) ([]byte, error) {
+func (sscClient *SSCClient) postRequest(path string, data []byte, contentType string) ([]byte, error) {
 	url := fmt.Sprintf("%s/%s", sscClient.url, path)
 	response, err := http.Post(url, contentType, bytes.NewBuffer(data))
 	if err != nil {
@@ -113,20 +116,12 @@ func readResponse(response *http.Response) ([]byte, error) {
 	return responseBody, nil
 }
 
-func (sscClient *SSCClient) sendTransaction(verb string, name string, value string, wait uint) ([]byte, error) {
+func (sscClient *SSCClient) sendTransaction(payloadData map[string]interface{}, wait uint) ([]byte, error) {
 
-	// construct the payload information in CBOR format
-	payloadData := make(map[string]interface{})
-	payloadData["Verb"] = verb
-	payloadData["Name"] = name
-	payloadData["Value"] = value
 	payload, err := cbor.Dumps(payloadData)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to construct CBOR: %s", err.Error())
 	}
-
-	// construct the address
-	address := sscClient.getAddress(name)
 
 	// Construct TransactionHeader
 	rawTransactionHeader := transaction_pb2.TransactionHeader{
@@ -136,9 +131,9 @@ func (sscClient *SSCClient) sendTransaction(verb string, name string, value stri
 		Dependencies:     []string{}, // empty dependency list
 		Nonce:            strconv.Itoa(rand.Int()),
 		BatcherPublicKey: sscClient.signer.GetPublicKey().AsHex(),
-		Inputs:           []string{address},
-		Outputs:          []string{address},
-		PayloadSha512:    sha512HashValue(string(payload)),
+		//Inputs:           []string{address},
+		//Outputs:          []string{address},
+		PayloadSha512: sha512HashValue(string(payload)),
 	}
 	transactionHeader, err := proto.Marshal(&rawTransactionHeader)
 	if err != nil {
@@ -169,7 +164,7 @@ func (sscClient *SSCClient) sendTransaction(verb string, name string, value stri
 	if wait > 0 {
 		waitTime := uint(0)
 		startTime := time.Now()
-		response, err := sscClient.postRequest(BatchSubmitAPI, batchList, ContentTypeOctetStream, name)
+		response, err := sscClient.postRequest(BatchSubmitAPI, batchList, ContentTypeOctetStream)
 		if err != nil {
 			return nil, err
 		}
@@ -186,7 +181,7 @@ func (sscClient *SSCClient) sendTransaction(verb string, name string, value stri
 		return response, nil
 	}
 
-	return sscClient.postRequest(BatchSubmitAPI, batchList, ContentTypeOctetStream, name)
+	return sscClient.postRequest(BatchSubmitAPI, batchList, ContentTypeOctetStream)
 }
 
 func (sscClient *SSCClient) getPrefix() string {
