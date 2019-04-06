@@ -3,8 +3,8 @@ package handler
 import (
 	"fmt"
 
-	sscpayload "github.com/adiclepcea/socialservicechain/ssc/payload"
-	sscstate "github.com/adiclepcea/socialservicechain/ssc/state"
+	sscpayload "github.com/adiclepcea/socialservicechain/cmd/ssc/payload"
+	sscstate "github.com/adiclepcea/socialservicechain/cmd/ssc/state"
 
 	"github.com/hyperledger/sawtooth-sdk-go/logging"
 	"github.com/hyperledger/sawtooth-sdk-go/processor"
