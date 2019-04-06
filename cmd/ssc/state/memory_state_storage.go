@@ -18,6 +18,7 @@ func (mss *MemoryStateStorage) GetNGO(name string) (*NGO, error) {
 	if len(mss.ngos) == 0 {
 		return nil, nil
 	}
+
 	return mss.ngos[name], nil
 }
 
@@ -37,7 +38,8 @@ func (mss *MemoryStateStorage) SaveNGO(ngo *NGO) error {
 		mss.ngos = map[string]*NGO{}
 	}
 	if mss.ngos[ngo.Name] != nil {
-		return fmt.Errorf("An NGO with this name already exists")
+		ngo.ID = mss.ngos[ngo.Name].ID
+		return nil
 	}
 	mss.mutex.Lock()
 	defer mss.mutex.Unlock()

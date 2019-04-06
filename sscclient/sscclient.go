@@ -89,15 +89,11 @@ func (sscClient *SSCClient) getRequest(path string) ([]byte, error) {
 
 func (sscClient *SSCClient) postRequest(path string, data []byte, contentType string) ([]byte, error) {
 	url := fmt.Sprintf("%s/%s", sscClient.url, path)
-	fmt.Println("#### 1", url)
 	response, err := http.Post(url, contentType, bytes.NewBuffer(data))
 	if err != nil {
 		log.Printf("Failed to perform the POST request: %s\n", err.Error())
 		return nil, err
 	}
-
-	fmt.Println("#### 2")
-
 	return readResponse(response)
 }
 
@@ -167,8 +163,6 @@ func (sscClient *SSCClient) sendTransaction(payloadData map[string]interface{}, 
 	if err != nil {
 		return nil, fmt.Errorf("Unable to serialize batch list: %s", err.Error())
 	}
-
-	fmt.Println(string(batchList))
 
 	if wait > 0 {
 		waitTime := uint(0)

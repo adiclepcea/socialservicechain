@@ -62,7 +62,7 @@ func (sa *SocialAggregator) Apply(request *processor_pb2.TpProcessRequest, conte
 		err = fnc(*payload, state)
 		if err != nil {
 			logger.Debugf(err.Error())
-			return &processor.InternalError{Msg: err.Error()}
+			return &processor.InvalidTransactionError{Msg: err.Error()}
 		}
 		return nil
 	}
@@ -72,34 +72,17 @@ func (sa *SocialAggregator) Apply(request *processor_pb2.TpProcessRequest, conte
 
 func createNGO(payload sscpayload.SSCPayload, state *sscstate.SSCState) error {
 
-	if err := validateNGO(payload, state); err != nil {
-		return err
-	}
-
 	ngo := sscstate.NGO{Name: payload.Name}
+	displayNGO(ngo)
 	if err := state.SaveNGO(&ngo); err != nil {
 		return err
 	}
-
-	displayNGO(&ngo)
-
-	return nil
-}
-
-func validateNGO(payload sscpayload.SSCPayload, sscstate *sscstate.SSCState) error {
-
-	ngo, err := sscstate.GetNGO(payload.Name)
-	if err != nil {
-		return err
-	}
-	if ngo != nil {
-		return &processor.InvalidTransactionError{Msg: "An NGO with this name already exists"}
-	}
+	displayNGO(ngo)
 
 	return nil
 }
 
-func displayNGO(ngo *sscstate.NGO) {
+func displayNGO(ngo sscstate.NGO) {
 	fmt.Printf("NGO ID: %d, name: %s\n", ngo.ID, ngo.Name)
 }
 

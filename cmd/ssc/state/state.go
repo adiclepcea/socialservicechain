@@ -61,11 +61,17 @@ type SSCState struct {
 	storage StateStorage
 }
 
+var myStorage StateStorage
+
+func init() {
+	myStorage = &MemoryStateStorage{}
+}
+
 //NewSSCState creates a new state from the given context
 func NewSSCState(context *processor.Context) *SSCState {
 	return &SSCState{
 		Context: context,
-		storage: &MemoryStateStorage{},
+		storage: myStorage,
 	}
 }
 

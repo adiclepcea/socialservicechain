@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/jessevdk/go-flags"
 )
 
@@ -47,6 +49,7 @@ func (args *CreateNGO) Run() error {
 	if err != nil {
 		return err
 	}
-	_, err = sscClient.CreateNGO(name, wait)
+	rez, err := sscClient.CreateNGO(name, wait)
+	fmt.Println(string(rez))
 	return err
 }
