@@ -6,12 +6,12 @@ replace github.com/hyperledger/sawtooth-sdk-go/protobuf/batch_pb2 v0.0.0 => ../.
 
 replace github.com/hyperledger/sawtooth-sdk-go/protobuf/transaction_pb2 v0.0.0 => ../../../../hyperledger/sawtooth-sdk-go/protobuf/transaction_pb2
 
+replace github.com/adiclepcea/socialservicechain/sscclient v0.0.0 => ../../sscclient
+
 require (
-	github.com/brianolson/cbor_go v1.0.0
-	github.com/btcsuite/btcd v0.0.0-20190315201642-aa6e0f35703c // indirect
-	github.com/golang/protobuf v1.3.1
+	github.com/adiclepcea/socialservicechain/sscclient v0.0.0
 	github.com/hyperledger/sawtooth-sdk-go v0.1.1
-	github.com/hyperledger/sawtooth-sdk-go/protobuf/batch_pb2 v0.0.0
-	github.com/hyperledger/sawtooth-sdk-go/protobuf/transaction_pb2 v0.0.0
-	gopkg.in/yaml.v2 v2.2.2
+	github.com/hyperledger/sawtooth-sdk-go/protobuf/batch_pb2 v0.0.0 // indirect
+	github.com/hyperledger/sawtooth-sdk-go/protobuf/transaction_pb2 v0.0.0 // indirect
+	github.com/jessevdk/go-flags v0.0.0-20141203071132-1679536dcc89
 )
