@@ -47,6 +47,8 @@ func (sa *SocialAggregator) Apply(request *processor_pb2.TpProcessRequest, conte
 	header := request.GetHeader()
 	player := header.GetSignerPublicKey()
 
+	fmt.Println("#### 1")
+
 	payload, err := sscpayload.FromBytes(request.GetPayload())
 	if err != nil {
 		return err

@@ -7,8 +7,7 @@ import (
 //CreateNGO is the command structure for createNGO
 type CreateNGO struct {
 	Args struct {
-		Name  string `positional-arg-name:"name" required:"true" description:"Name of the key"`
-		Value string `positional-arg-name:"value" required:"true" description:"Name of the NGO"`
+		Name string `positional-arg-name:"name" required:"true" description:"Name of the NGO"`
 	} `positional-args:"true"`
 	URL     string `long:"url" description:"Specify URL of REST API"`
 	Keyfile string `long:"keyfile" description:"Identify file containing user's private key"`
@@ -42,13 +41,12 @@ func (args *CreateNGO) Register(parent *flags.Command) error {
 //Run will run the action associated with this command
 func (args *CreateNGO) Run() error {
 	name := args.Args.Name
-	value := args.Args.Value
 	wait := args.Wait
 
 	sscClient, err := createClient(args, true)
 	if err != nil {
 		return err
 	}
-	_, err = sscClient.CreateNGO(name, value, wait)
+	_, err = sscClient.CreateNGO(name, wait)
 	return err
 }
