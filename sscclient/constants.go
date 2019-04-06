@@ -2,7 +2,7 @@ package sscclient
 
 const (
 	//FamilyName is the name of the transaction family for this client
-	FamilyName string = "ssc"
+	FamilyName string = "SocialServiceChain"
 	//FamilyVersion is the version of the transaction family for this client
 	FamilyVersion string = "1.0"
 	//DistributionName is the name of this client

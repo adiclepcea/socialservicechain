@@ -110,13 +110,14 @@ func createClient(args Command, readFile bool) (*sscclient.SSCClient, error) {
 		url = sscclient.DefaultURL
 	}
 	keyfile := ""
-	if readFile {
+	/*if readFile {
 		var err error
 		keyfile, err = validateKeyfile(args.KeyfilePassed())
 		if err != nil {
 			return nil, err
 		}
-	}
+	}*/
+
 	return sscclient.NewSSCClient(url, keyfile)
 }
 
@@ -126,8 +127,7 @@ func validateKeyfile(keyfile string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return path.Join(
-			username.HomeDir, ".sawtooth", "keys", username.Username+".priv"), nil
+		return path.Join(username.HomeDir, ".sawtooth", "keys", username.Username+".priv"), nil
 	}
 	return keyfile, nil
 

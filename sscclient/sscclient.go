@@ -99,11 +99,14 @@ func (sscClient *SSCClient) getRequest(path string) ([]byte, error) {
 
 func (sscClient *SSCClient) postRequest(path string, data []byte, contentType string) ([]byte, error) {
 	url := fmt.Sprintf("%s/%s", sscClient.url, path)
+	fmt.Println("#### 1", url)
 	response, err := http.Post(url, contentType, bytes.NewBuffer(data))
 	if err != nil {
 		log.Printf("Failed to perform the POST request: %s\n", err.Error())
 		return nil, err
 	}
+
+	fmt.Println("#### 2")
 
 	return readResponse(response)
 }
@@ -134,6 +137,8 @@ func (sscClient *SSCClient) sendTransaction(payloadData map[string]interface{}, 
 		return nil, fmt.Errorf("Failed to construct CBOR: %s", err.Error())
 	}
 
+	address := sscClient.getAddress("FamilyName")
+
 	// Construct TransactionHeader
 	rawTransactionHeader := transaction_pb2.TransactionHeader{
 		SignerPublicKey:  sscClient.signer.GetPublicKey().AsHex(),
@@ -142,9 +147,9 @@ func (sscClient *SSCClient) sendTransaction(payloadData map[string]interface{}, 
 		Dependencies:     []string{}, // empty dependency list
 		Nonce:            strconv.Itoa(rand.Int()),
 		BatcherPublicKey: sscClient.signer.GetPublicKey().AsHex(),
-		//Inputs:           []string{address},
-		//Outputs:          []string{address},
-		PayloadSha512: sha512HashValue(string(payload)),
+		Inputs:           []string{address},
+		Outputs:          []string{address},
+		PayloadSha512:    sha512HashValue(string(payload)),
 	}
 	transactionHeader, err := proto.Marshal(&rawTransactionHeader)
 	if err != nil {
@@ -166,11 +171,14 @@ func (sscClient *SSCClient) sendTransaction(payloadData map[string]interface{}, 
 	if err != nil {
 		return nil, fmt.Errorf("Unable to construct batch list: %s", err.Error())
 	}
+
 	batchID := rawBatchList.Batches[0].HeaderSignature
 	batchList, err := proto.Marshal(&rawBatchList)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to serialize batch list: %s", err.Error())
 	}
+
+	fmt.Println(string(batchList))
 
 	if wait > 0 {
 		waitTime := uint(0)
@@ -179,6 +187,7 @@ func (sscClient *SSCClient) sendTransaction(payloadData map[string]interface{}, 
 		if err != nil {
 			return nil, err
 		}
+
 		for waitTime < wait {
 			status, err := sscClient.getStatus(batchID, wait-waitTime)
 			if err != nil {
@@ -196,6 +205,7 @@ func (sscClient *SSCClient) sendTransaction(payloadData map[string]interface{}, 
 }
 
 func (sscClient *SSCClient) getPrefix() string {
+	fmt.Println("######", sha512HashValue(FamilyName)[:FamilyNamespaceAddressLen])
 	return sha512HashValue(FamilyName)[:FamilyNamespaceAddressLen]
 }
 

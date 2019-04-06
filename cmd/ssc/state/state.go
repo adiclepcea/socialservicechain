@@ -52,7 +52,7 @@ type DonationAssignment struct {
 }
 
 //Namespace will hold the sawtooth namespace
-var Namespace = hexdigest("ssc")[:6]
+var Namespace = hexdigest("SocialServiceChain")[:6]
 
 //SSCState represents the state for this app (Social Service Chain)
 //This will be used to store and read the state
