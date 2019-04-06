@@ -47,8 +47,6 @@ func (sa *SocialAggregator) Apply(request *processor_pb2.TpProcessRequest, conte
 	header := request.GetHeader()
 	player := header.GetSignerPublicKey()
 
-	fmt.Println("#### 1")
-
 	payload, err := sscpayload.FromBytes(request.GetPayload())
 	if err != nil {
 		return err
@@ -56,15 +54,20 @@ func (sa *SocialAggregator) Apply(request *processor_pb2.TpProcessRequest, conte
 
 	state := sscstate.NewSSCState(context)
 
-	logger.Debugf("xo txn %v: player %v: payload: Name='%v', Action='%v', Space='%v'",
+	logger.Debugf("SocialServiceChain txn %v: player %v: payload: Name='%v', Action='%v', Space='%v'",
 		request.Signature, player, payload.Name, payload.Action, payload.Space)
 
 	fnc := mapActions[payload.Action]
 	if fnc != nil {
-		fnc(payload, state)
+		err = fnc(*payload, state)
+		if err != nil {
+			logger.Debugf(err.Error())
+			return &processor.InternalError{Msg: err.Error()}
+		}
+		return nil
 	}
 
-	return nil
+	return &processor.InvalidTransactionError{Msg: "No such function"}
 }
 
 func createNGO(payload sscpayload.SSCPayload, state *sscstate.SSCState) error {

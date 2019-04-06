@@ -1,15 +1,24 @@
 package sscstate
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+)
 
 //MemoryStateStorage implements a simple in memory state storage
 type MemoryStateStorage struct {
 	StateStorage
+	ngos  map[string]*NGO
+	ngoix int64
+	mutex sync.Mutex
 }
 
 //GetNGO returns the NGO by name
 func (mss *MemoryStateStorage) GetNGO(name string) (*NGO, error) {
-	return nil, fmt.Errorf("Not implemented yet")
+	if len(mss.ngos) == 0 {
+		return nil, nil
+	}
+	return mss.ngos[name], nil
 }
 
 //GetNGOByID returns the NGO by id
@@ -18,8 +27,24 @@ func (mss *MemoryStateStorage) GetNGOByID(id int64) (*NGO, error) {
 }
 
 //SaveNGO will try to save the NGO
-func (mss *MemoryStateStorage) SaveNGO(*NGO) error {
-	return fmt.Errorf("Not implemented yet")
+func (mss *MemoryStateStorage) SaveNGO(ngo *NGO) error {
+	if len(mss.ngos) == 0 {
+		mss.mutex.Lock()
+		if len(mss.ngos) == 0 {
+			mss.ngos = map[string]*NGO{}
+		}
+		mss.mutex.Unlock()
+		mss.ngos = map[string]*NGO{}
+	}
+	if mss.ngos[ngo.Name] != nil {
+		return fmt.Errorf("An NGO with this name already exists")
+	}
+	mss.mutex.Lock()
+	defer mss.mutex.Unlock()
+	mss.ngoix++
+	ngo.ID = mss.ngoix
+	mss.ngos[ngo.Name] = ngo
+	return nil
 }
 
 //DeleteNGO will delete the NGO
