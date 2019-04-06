@@ -52,10 +52,21 @@ func NewSSCClient(url string, keyfile string) (*SSCClient, error) {
 }
 
 //CreateNGO will create an NGO by calling the validator
-func (sscClient *SSCClient) CreateNGO(name string, wait uint) ([]byte, error) {
+func (sscClient *SSCClient) CreateNGO(name string, value string, wait uint) ([]byte, error) {
 	payloadData := map[string]interface{}{}
 	payloadData["Verb"] = VerbCreateNGO
 	payloadData["Name"] = name
+	payloadData["Value"] = value
+	return sscClient.sendTransaction(payloadData, wait)
+}
+
+func (sscClient *SSCClient) CreateSC(name string, needName string, amount float64, um string, wait uint) ([]byte, error) {
+	payloadData := map[string]interface{}{}
+	payloadData["Verb"] = VerbCreateSocialCase
+	payloadData["Name"] = name
+	payloadData["NeedName"] = needName
+	payloadData["Amount"] = amount
+	payloadData["Um"] = um
 	return sscClient.sendTransaction(payloadData, wait)
 }
 

@@ -52,6 +52,7 @@ func main() {
 	// Add sub-commands
 	commands := []Command{
 		&CreateNGO{},
+		&CreateSC{},
 	}
 	for _, cmd := range commands {
 		err := cmd.Register(parser.Command)
